@@ -9,18 +9,22 @@
     <!-- scripts -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script> -->
     <script src="https://d3js.org/d3.v3.min.js"></script>
   </head>
   <body>
     <h1>Tracer Demo</h1>
+    <input id="fileupload" type="file" onchange="previewFile()"><br>
     <form>
       <label for="mode">Mode</label>
       <select id="mode"></select><br>
     </form>
-    <input type="text" class="tag" value="tag"></input>
+    <form>
+      <label for="tag">Tag</label>
+      <select id="tag"></select><br>
+    </form>
+    <!-- <input type="text" class="tag" value="tag"></input> -->
     <div class="tracerzone"></div>
     <script type="text/javascript" src="static/tracer.js"></script>
-    <!-- <script type="text/javascript" src="static/tracertest.js"></script> -->
   </body>
 </html>
