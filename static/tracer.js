@@ -10,7 +10,9 @@ var modes = {
 var tag = "Po";
 var current_mode = modes.POINT;
 
-var data = {'point':{},'spline':{}};
+var data = {'point':{},'spline':{},'width':960,'height':0};
+var im_string = "";
+var im_format = "";
     
 var dragged = null,
     selected = null;
@@ -78,6 +80,82 @@ d3.select(window)
     .on("mousemove", mousemove)
     .on("mouseup", mouseup)
     .on("keydown", keydown);
+
+d3.select("#save_button")
+    .on("click",save_data);
+
+function save_data(){
+    console.log("saving data");
+
+    im_and_data = {
+	image:im_string,
+	format:im_format,
+	data:data
+    };
+    var http = new XMLHttpRequest();
+    http.open("POST", "/save_data", true);
+    http.setRequestHeader("Content-type","application/json");
+    http.send(JSON.stringify(im_and_data));
+    http.onload = function() {
+        alert(http.responseText);
+    }
+}
+
+function resize(width,height,wanted_width){
+    return height*(wanted_width/width);
+}
+
+function handleFileSelect(){
+    var files = d3.event.target.files;
+    var file = files[0];
+    var reader = new FileReader();
+
+    reader.onload = (function(theFile){
+	return function(e){
+
+	    var image = new Image();
+	    image.src = e.target.result;
+	    
+	    // save image as a string
+	    im_string = e.target.result.replace("data:"+ theFile.type +";base64,", '');
+	    im_format = theFile.type;
+
+	    image.onload = function() {
+		// access image size here
+
+		width = 960;
+		height = resize(this.width,this.height,width);
+
+		data.width = width;
+		data.height = height;
+
+		d3.select("svg")
+		    .attr("width",width)
+		    .attr("height",height);
+
+		d3.select("rect")
+		    .attr("width",width)
+		    .attr("height",height);
+
+		d3.select("image")
+		    .attr("width",width)
+		    .attr("height",height);
+	    };
+
+	    d3.select("svg")
+	        .insert("image","rect")
+	        // .attr("width",width)
+	        // .attr("height",height)
+	        .attr("xlink:href",e.target.result);
+	    };
+	})(file);
+
+    reader.readAsDataURL(file);
+}
+
+d3.select('#fileupload')
+    .on('change',handleFileSelect);
+// document.getElementById('fileupload').addEventListener('change', handleFileSelect, false);
 
 function mousemove() {
     if (!dragged) return;

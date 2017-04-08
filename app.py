@@ -1,7 +1,10 @@
-from flask import Flask, render_template, g
+from flask import Flask, render_template, g, request
+import random
 import sqlite3
+import json
 
 DATABASE = "db/database.db"
+DATA_FOLDER = './data'
 
 app = Flask(__name__)
 
@@ -25,6 +28,25 @@ def ping():
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/save_data",methods=['POST'])
+def save_data():
+    data = request.json
+    # import ipdb
+    # ipdb.set_trace()
+    
+    file_type = data['format'].split('/')[-1]
+    file_id = str(random.randint(0,1e6))
+    file_name = "%s.%s"%(file_id,file_type)
+
+
+    with open("%s/%s"%(DATA_FOLDER,file_name), "wb") as fh:
+        fh.write(data['image'].decode('base64'))
+
+    with open("%s/data.txt"%DATA_FOLDER,'a+') as fh:
+        fh.write("%s|%s|%s\n"%(file_id,file_type,json.dumps(data['data'])))
+
+    return "Data succesfully sent to server."
 
 @app.teardown_appcontext
 def close_connection(exception):
